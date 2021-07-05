@@ -1,28 +1,20 @@
-function Smart_lights () {
-    if (input.lightLevel() < 8) {
-        pins.digitalWritePin(DigitalPin.P1, 1)
-    } else {
-        pins.digitalWritePin(DigitalPin.P1, 0)
-    }
-}
-function movement_for_garage () {
-    pins.digitalWritePin(DigitalPin.P8, pins.digitalReadPin(DigitalPin.P2))
-}
-function Garage () {
-    if (input.buttonIsPressed(Button.A)) {
-        for (let index2 = 0; index2 <= 120; index2++) {
-            pins.servoWritePin(AnalogPin.P0, 120 - index2)
-            basic.pause(10)
-        }
-    } else if (input.buttonIsPressed(Button.B)) {
-        for (let index = 0; index <= 120; index++) {
-            pins.servoWritePin(AnalogPin.P0, index)
-            basic.pause(10)
-        }
-    }
-}
+let distance2 = 0
+I2C_LCD1602.LcdInit(0)
 basic.forever(function () {
-    Garage()
-    Smart_lights()
-    movement_for_garage()
+    I2C_LCD1602.clear()
+    distance2 = sonar.ping(
+    DigitalPin.P1,
+    DigitalPin.P0,
+    PingUnit.Centimeters
+    )
+    basic.pause(100)
+    if (distance2 < 5) {
+        I2C_LCD1602.ShowString("Someone is at", 0, 0)
+        basic.pause(1000)
+        I2C_LCD1602.ShowString("the Garage!", 0, 1)
+        basic.pause(1000)
+    } else {
+        I2C_LCD1602.ShowString("Distance is:", 0, 0)
+        I2C_LCD1602.ShowNumber(distance2, 12, 0)
+    }
 })
